@@ -34,3 +34,52 @@ app.get('/api/notes', (req, res) => {
     }
   });
 });
+
+app.get('/api/notes', (req, res) => {
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading file:', err.message);
+        res.status(500).json({ error: 'Failed to read notes', details: err.message });
+      } else {
+        try {
+          const notes = JSON.parse(data);
+          res.json(notes);
+        } catch (parseErr) {
+          console.error('Error parsing JSON:', parseErr.message);
+          res.status(500).json({ error: 'Failed to parse notes', details: parseErr.message });
+        }
+      }
+    });
+  });
+  
+  app.post('/api/notes', (req, res) => {
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading file:', err.message);
+        res.status(500).json({ error: 'Failed to read notes', details: err.message });
+      } else {
+        try {
+          const notes = JSON.parse(data);
+          const newNote = req.body;
+          newNote.id = uuidv4();
+          notes.push(newNote);
+          
+          fs.writeFile(dbPath, JSON.stringify(notes, null, 2), (err) => {
+            if (err) {
+              console.error('Error writing file:', err.message);
+              res.status(500).json({ error: 'Failed to add note', details: err.message });
+            } else {
+              res.json(newNote);
+            }
+          });
+        } catch (parseErr) {
+          console.error('Error parsing JSON:', parseErr.message);
+          res.status(500).json({ error: 'Failed to parse notes', details: parseErr.message });
+        }
+      }
+    });
+  });
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
