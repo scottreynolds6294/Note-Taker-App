@@ -80,6 +80,34 @@ app.get('/api/notes', (req, res) => {
     });
   });
 
+  app.delete('/api/notes/:id', (req, res) => {
+    const noteId = req.params.id;
+  
+    fs.readFile(dbPath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading file:', err.message);
+        res.status(500).json({ error: 'Failed to read notes', details: err.message });
+      } else {
+        try {
+          let notes = JSON.parse(data);
+          const updatedNotes = notes.filter((note) => note.id !== noteId);
+  
+          fs.writeFile(dbPath, JSON.stringify(updatedNotes, null, 2), (err) => {
+            if (err) {
+              console.error('Error writing file:', err.message);
+              res.status(500).json({ error: 'Failed to delete note', details: err.message });
+            } else {
+              res.json({ message: 'Note deleted successfully' });
+            }
+          });
+        } catch (parseErr) {
+          console.error('Error parsing JSON:', parseErr.message);
+          res.status(500).json({ error: 'Failed to parse notes', details: parseErr.message });
+        }
+      }
+    });
+  });
+  
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
