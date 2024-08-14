@@ -27,7 +27,7 @@ Click the get started button to add and delete notes that the user creates.
 
 Link to the deployed application: https://note-taker-app-in84.onrender.com/
 
-![alt text](image.png)
+![alt text](/public/assets/images/image.png)
 
 
 
